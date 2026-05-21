@@ -51,59 +51,6 @@
         <!-- 这里放你原来的表格数据 -->
         </tbody>
     </table>
-
-    <script>
-        // 初始化地图，中心和缩放按你的数据调整
-        const map = L.map('map').setView([29.09, 110.274], 13);
-        // 添加地图底图
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        let markers = [];
-
-        // 读取CSV数据并添加点位
-        fetch('plants.csv')
-            .then(response => response.text())
-            .then(text => {
-                const lines = text.trim().split('\n');
-                const headers = lines[0].split(',');
-                for (let i = 1; i < lines.length; i++) {
-                    const values = lines[i].split(',');
-                    const plant = {};
-                    headers.forEach((header, index) => {
-                        plant[header] = values[index];
-                    });
-
-                    // 创建点位
-                    const marker = L.marker([parseFloat(plant['纬度(Y)']), parseFloat(plant['经度(X)'])]).addTo(map);
-                    // 绑定弹窗，显示植物信息
-                    marker.bindPopup(`
-                        <b>${plant['中文名']}</b><br>
-                        拉丁学名: ${plant['拉丁学名']}<br>
-                        经纬度: ${plant['经度(X)']}, ${plant['纬度(Y)']}<br>
-                        科属: ${plant['科属'] || ''}<br>
-                        分布: ${plant['地理分布'] || ''}
-                    `);
-                    markers.push({ name: plant['中文名'], marker });
-                }
-            });
-
-        // 搜索联动地图
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const searchTerm = this.value.trim();
-            markers.forEach(({ name, marker }) => {
-                if (name.includes(searchTerm)) {
-                    marker.openPopup();
-                    map.setView(marker.getLatLng(), 15);
-                } else {
-                    marker.closePopup();
-                }
-            });
-        });
-    </script>
-</body>
-</html>
         <tr class="item-row">
             <td>1</td>
             <td><img src="xiaopengcao.jpg" 
@@ -532,16 +479,54 @@ alt="一年蓬" class="plant-img"></td>
     </tbody>
 </table>
 <script>
-    const searchInput = document.getElementById('searchInput');
-    const items = document.querySelectorAll('.item-row');
+        // 初始化地图，中心和缩放按你的数据调整
+        const map = L.map('map').setView([29.09, 110.274], 13);
+        // 添加地图底图
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-    searchInput.addEventListener('input', function(e) {
-        const keyword = e.target.value.toLowerCase();
-        items.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(keyword) ? 'table-row' : 'none';
+        let markers = [];
+
+        // 读取CSV数据并添加点位
+        fetch('plants.csv')
+            .then(response => response.text())
+            .then(text => {
+                const lines = text.trim().split('\n');
+                const headers = lines[0].split(',');
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',');
+                    const plant = {};
+                    headers.forEach((header, index) => {
+                        plant[header] = values[index];
+                    });
+
+                    // 创建点位
+                    const marker = L.marker([parseFloat(plant['纬度(Y)']), parseFloat(plant['经度(X)'])]).addTo(map);
+                    // 绑定弹窗，显示植物信息
+                    marker.bindPopup(`
+                        <b>${plant['中文名']}</b><br>
+                        拉丁学名: ${plant['拉丁学名']}<br>
+                        经纬度: ${plant['经度(X)']}, ${plant['纬度(Y)']}<br>
+                        科属: ${plant['科属'] || ''}<br>
+                        分布: ${plant['地理分布'] || ''}
+                    `);
+                    markers.push({ name: plant['中文名'], marker });
+                }
+            });
+
+        // 搜索联动地图
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            markers.forEach(({ name, marker }) => {
+                if (name.includes(searchTerm)) {
+                    marker.openPopup();
+                    map.setView(marker.getLatLng(), 15);
+                } else {
+                    marker.closePopup();
+                }
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
